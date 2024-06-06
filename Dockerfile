@@ -25,6 +25,9 @@ RUN apk update && \
   apk del .build-dependencies && \
   docker-php-ext-install intl pdo_mysql mbstring zip bcmath gd sockets
 
+# Install Node.js and npm
+RUN apk add --update --no-cache nodejs npm
+
 # service
 COPY startup.sh /root/startup.sh
 RUN chmod +x /root/startup.sh
