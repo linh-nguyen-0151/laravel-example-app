@@ -9,7 +9,7 @@ on:
       - develop
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
 
     services:
@@ -30,7 +30,7 @@ jobs:
           --health-retries=3
 
     steps:
-      - name: Check out the repository
+      - name: Checkout code
         uses: actions/checkout@v3
 
       - name: Set up PHP
@@ -40,7 +40,7 @@ jobs:
           extensions: mbstring, bcmath, pdo_mysql, zip, mysqli, xml
           tools: composer
 
-      - name: Install dependencies
+      - name: Install Composer dependencies
         run: composer install --prefer-dist --no-interaction --no-progress --no-suggest --optimize-autoloader
 
       - name: Copy .env file
@@ -58,10 +58,11 @@ jobs:
           sed -i 's/DB_USERNAME=laravel/DB_USERNAME=laravel/' .env
           sed -i 's/DB_PASSWORD=root/DB_PASSWORD=root/' .env
 
-      - name: Run migrations and seed database
-        run: |
-          php artisan migrate --force
-          php artisan db:seed --force
+      - name: Run migrations
+        run: php artisan migrate --force
 
-      - name: Run PHPUnit tests
-        run: php artisan test --coverage-text
+      - name: Run seeds
+        run: php artisan db:seed --force
+
+      - name: Run tests
+        run: vendor/bin/phpunit
