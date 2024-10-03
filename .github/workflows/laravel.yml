@@ -1,4 +1,4 @@
-name: Laravel CI/CD
+name: Laravel CI
 
 on:
   push:
@@ -14,15 +14,14 @@ jobs:
 
     services:
       mysql:
-        image: mysql:8.0
-        container_name: mysql2
-        ports:
-          - "3306:3306"
+        image: mysql:5.7
         env:
-          MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: laravel
-          MYSQL_PASSWORD: root
-          MYSQL_USER: laravel
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
+        ports:
+          - 3306:3306
         options: >-
           --health-cmd="mysqladmin ping --silent"
           --health-interval=10s
@@ -31,32 +30,23 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v2
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.2"
-          extensions: mbstring, bcmath, pdo_mysql, zip, mysqli, xml
-          tools: composer
+          php-version: "8.1"
+          extensions: mbstring, xml, bcmath, mysqli
+          coverage: none
 
       - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-interaction --no-progress --no-suggest --optimize-autoloader
+        run: composer install --prefer-dist --no-progress --no-suggest --optimize-autoloader
 
       - name: Copy .env file
         run: cp .env.example .env
 
       - name: Generate application key
         run: php artisan key:generate
-
-      - name: Set environment variables for MySQL
-        run: |
-          sed -i 's/DB_CONNECTION=mysql/DB_CONNECTION=mysql/' .env
-          sed -i 's/DB_HOST=127.0.0.1/DB_HOST=127.0.0.1/' .env
-          sed -i 's/DB_PORT=3306/DB_PORT=3306/' .env
-          sed -i 's/DB_DATABASE=laravel/DB_DATABASE=laravel/' .env
-          sed -i 's/DB_USERNAME=laravel/DB_USERNAME=laravel/' .env
-          sed -i 's/DB_PASSWORD=root/DB_PASSWORD=root/' .env
 
       - name: Run migrations
         run: php artisan migrate --force
