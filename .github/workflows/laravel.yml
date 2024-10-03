@@ -14,14 +14,15 @@ jobs:
 
     services:
       mysql:
-        image: mysql:5.7
+        image: mysql:8.0
+        container_name: mysql2
+        ports:
+          - "3306:3306"
         env:
           MYSQL_DATABASE: laravel
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_USER: user
-          MYSQL_PASSWORD: password
-        ports:
-          - 3306:3306
+          MYSQL_PASSWORD: root
+          MYSQL_USER: laravel
         options: >-
           --health-cmd="mysqladmin ping --silent"
           --health-interval=10s
@@ -35,9 +36,9 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.1"
-          extensions: mbstring, xml, bcmath, mysqli
-          coverage: none
+          php-version: "8.2"
+          extensions: mbstring, bcmath, pdo_mysql, zip, mysqli, xml
+          tools: composer
 
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-progress --no-suggest --optimize-autoloader
