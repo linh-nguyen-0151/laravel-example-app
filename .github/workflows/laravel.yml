@@ -14,12 +14,12 @@ jobs:
 
     services:
       mysql:
-        image: mysql:5.7
+        image: mysql:8.0
         env:
           MYSQL_DATABASE: laravel
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_USER: user
-          MYSQL_PASSWORD: password
+          MYSQL_PASSWORD: root
+          MYSQL_USER: laravel
         ports:
           - 3306:3306
         options: >-
@@ -35,12 +35,13 @@ jobs:
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.1"
-          extensions: mbstring, xml, bcmath, mysqli
+          php-version: "8.2"
+          extensions: mbstring, bcmath, pdo_mysql, zip, mysqli, xml
           coverage: none
+          tools: composer
 
-      - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-progress --no-suggest --optimize-autoloader
+      - name: Install dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress --no-suggest --optimize-autoloader
 
       - name: Copy .env file
         run: cp .env.example .env
@@ -56,3 +57,6 @@ jobs:
 
       - name: Run tests
         run: vendor/bin/phpunit
+
+      - name: Run PHPUnit tests
+        run: php artisan test --coverage-text
