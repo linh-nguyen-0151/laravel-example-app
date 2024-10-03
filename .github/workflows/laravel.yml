@@ -1,4 +1,4 @@
-name: Laravel CI/CD
+name: Laravel CI
 
 on:
   push:
@@ -14,14 +14,12 @@ jobs:
 
     services:
       mysql:
-        image: mysql:8.0
-        container_name: mysql2
-
+        image: mysql:5.7
         env:
           MYSQL_DATABASE: laravel
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_USER: laravel
-          MYSQL_PASSWORD: root
+          MYSQL_USER: user
+          MYSQL_PASSWORD: password
         ports:
           - 3306:3306
         options: >-
@@ -31,19 +29,18 @@ jobs:
           --health-retries=3
 
     steps:
-      - name: Check out the repository
-        uses: actions/checkout@v3
+      - name: Checkout code
+        uses: actions/checkout@v2
 
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.2"
-          extensions: mbstring, bcmath, pdo_mysql, zip, mysqli, xml
+          php-version: "8.1"
+          extensions: mbstring, xml, bcmath, mysqli
           coverage: none
-          tools: composer
 
-      - name: Install dependencies
-        run: composer install --prefer-dist --no-interaction --no-progress --no-suggest --optimize-autoloader
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress --no-suggest --optimize-autoloader
 
       - name: Copy .env file
         run: cp .env.example .env
@@ -51,10 +48,11 @@ jobs:
       - name: Generate application key
         run: php artisan key:generate
 
-      - name: Run migrations and seed database
-        run: |
-          php artisan migrate --force
-          php artisan db:seed --force
+      - name: Run migrations
+        run: php artisan migrate --force
 
-      - name: Run PHPUnit tests
-        run: php artisan test --coverage-text
+      - name: Run seeds
+        run: php artisan db:seed --force
+
+      - name: Run tests
+        run: vendor/bin/phpunit
