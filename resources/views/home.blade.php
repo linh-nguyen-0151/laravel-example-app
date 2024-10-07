@@ -2,7 +2,7 @@
 
 @section('content')
 <div class="container">
-    <h1>Test cicd: merge develop 2</h1>
+    <h1>Test cicd: merge develop 3</h1>
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card">
