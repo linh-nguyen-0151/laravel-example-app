@@ -34,5 +34,6 @@ jobs:
             git checkout develop
             git pull origin develop
             npm run build
+            docker-compose stop
             docker-compose down
             docker-compose up -d
